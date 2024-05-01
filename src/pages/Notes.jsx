@@ -1,34 +1,63 @@
-import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import Button from "../components/atoms/Button";
-import Card from "../components/atoms/Card";
-import Checkbox from "../components/atoms/Checkbox";
-import Icon from "../components/atoms/Icon";
 import { openModal } from "../libs/modal";
 import ModalFormChecklist from "../components/organisms/ModalFormChecklist";
+import { useEffect, useState } from "react";
+import server from "../libs/server";
+import NoteItem from "../components/molecules/NoteItem";
 
 export default function Notes() {
+  const [checklists, setChecklists] = useState([])
+  const fetchChecklists = async () => {
+    try {
+      const response = await server.get('/checklist')
+      const { data } = await response.data
+
+      setChecklists(data)
+    } catch (error) {
+      alert(error.message)
+    }
+  }
+  const handleDeleteChecklist = async (id) => {
+    try {
+      const response = await server.delete(`/checklist/${id}`)
+
+      console.log(response)
+
+      fetchChecklists()
+    } catch (error) {
+      alert(error.message)
+    }
+  }
+  const handleAddNote = (item) => {
+    // setSelectedChecklist(item)
+    openModal('modal_form_note')
+  }
+
+  useEffect(() => {
+    fetchChecklists()
+  }, [])
+
   return (
-    <div className="container mx-auto p-24">
+    <>
       <ModalFormChecklist />
       <Button type="button" handleOnClick={() => openModal('form_modal_checklist')}>
         Add Checklist
       </Button>
-      <div className="grid grid-cols-3 mt-10">
-        <div className="col-span-1">
-          <Card>
-            <h1 className="text-xl font-semibold">Checklist Name</h1>
-            <ul className="mb-5">
-              <li className="flex items-center gap-3">
-                <Checkbox value={false} checked={false} />
-                Item 1
-              </li>
-            </ul>
-            <Button size="sm">
-              <Icon icon={faTrashAlt} />
-            </Button>
-          </Card>
+      {checklists.length > 0 ? (
+        <div className="grid grid-cols-3 mt-10 gap-5">
+          {checklists.map((item, index) => (
+            <div className="col-span-1" key={index}>
+              <NoteItem
+                checklist={item}
+                handleOnDelete={() => handleDeleteChecklist(item.id)}
+                handleAddNote={() => handleAddNote(item)}
+              />
+            </div>
+          ))}
         </div>
-      </div>
-    </div>
+      ) : (
+        <h1 className="text-center font-bold">You have no one notes</h1>
+      )}
+    </>
   )
 }

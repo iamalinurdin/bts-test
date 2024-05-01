@@ -7,8 +7,11 @@ import Button from "../components/atoms/Button";
 import Card from "../components/atoms/Card";
 import server from "../libs/server";
 import TextError from "../components/atoms/TextError";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/slices/authSlice";
 
 export default function Login() {
+  const dispatch = useDispatch()
   const validationSchema = Yup.object().shape({
     username: Yup.string().required(),
     password: Yup.string().required()
@@ -22,8 +25,9 @@ export default function Login() {
     onSubmit: async (payload) => {
       try {
         const response = await server.post('/login', payload)
+        const { data } = response.data
 
-        console.log(response)
+        dispatch(login({ token: data.token }))
       } catch (error) {
         alert(error.message)
       }
