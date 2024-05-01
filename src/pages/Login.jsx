@@ -9,9 +9,11 @@ import server from "../libs/server";
 import TextError from "../components/atoms/TextError";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const validationSchema = Yup.object().shape({
     username: Yup.string().required(),
     password: Yup.string().required()
@@ -28,6 +30,7 @@ export default function Login() {
         const { data } = response.data
 
         dispatch(login({ token: data.token }))
+        navigate('/')
       } catch (error) {
         alert(error.message)
       }

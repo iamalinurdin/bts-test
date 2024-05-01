@@ -6,6 +6,7 @@ import Notes from './pages/Notes'
 import FormNote from './pages/FormNote'
 import Layout from './components/organisms/Layout'
 import DetailNote from './pages/DetailNote'
+import PrivateRoute from './components/organisms/PrivateRoute'
 
 function App() {
   return (
@@ -15,10 +16,18 @@ function App() {
         <Route path='/register' element={<Register />} />
       </Route>
       <Route element={<Layout />}>
-        <Route path='/' element={<Notes />} />
-        <Route path='/checklist/:id/note' element={<FormNote />} />
-        <Route path='/checklist/:id' element={<DetailNote />} />
-        <Route path='/checklist/:id/note/:noteId' element={<FormNote />} />
+        <Route element={<PrivateRoute />}>
+          <Route path='/' element={<Notes />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route path='/checklist/:id/note' element={<FormNote />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route path='/checklist/:id' element={<DetailNote />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route path='/checklist/:id/note/:noteId' element={<FormNote />} />
+        </Route>
       </Route>
     </Routes>
   )
